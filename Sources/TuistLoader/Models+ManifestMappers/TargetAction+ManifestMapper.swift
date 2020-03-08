@@ -19,10 +19,13 @@ extension TuistCore.TargetAction {
         let outputPaths = try manifest.outputPaths.map { try generatorPaths.resolve(path: $0) }
         let outputFileListPaths = try manifest.outputFileListPaths.map { try generatorPaths.resolve(path: $0) }
         let path = try manifest.path.map { try generatorPaths.resolve(path: $0) }
+        let script = manifest.script
+
         return TargetAction(name: name,
                             order: order,
                             tool: tool,
                             path: path,
+                            script: script,
                             arguments: arguments,
                             inputPaths: inputPaths,
                             inputFileListPaths: inputFileListPaths,

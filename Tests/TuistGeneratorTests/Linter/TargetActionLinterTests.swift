@@ -42,4 +42,12 @@ final class TargetActionLinterTests: TuistUnitTestCase {
                                     severity: .error)
         XCTAssertTrue(got.contains(expected))
     }
+
+    func test_lint_whenScriptAction() throws {
+        let action = TargetAction(name: "name",
+                                  order: .pre,
+                                  script: "echo")
+        let got = subject.lint(action)
+        XCTAssertTrue(got.isEmpty)
+    }
 }

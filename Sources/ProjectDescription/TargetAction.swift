@@ -16,6 +16,8 @@ public struct TargetAction: Codable, Equatable {
     /// Name of the tool to execute. Tuist will look up the tool on the environment's PATH.
     public let tool: String?
 
+    public let script: String?
+
     /// Path to the script to execute.
     public let path: Path?
 
@@ -41,6 +43,7 @@ public struct TargetAction: Codable, Equatable {
         case name
         case tool
         case path
+        case script
         case order
         case arguments
         case inputPaths
@@ -64,6 +67,7 @@ public struct TargetAction: Codable, Equatable {
     init(name: String,
          tool: String?,
          path: Path?,
+         script: String?,
          order: Order,
          arguments: [String],
          inputPaths: [Path] = [],
@@ -73,6 +77,7 @@ public struct TargetAction: Codable, Equatable {
         self.name = name
         self.path = path
         self.tool = tool
+        self.script = script
         self.order = order
         self.arguments = arguments
         self.inputPaths = inputPaths
@@ -102,8 +107,27 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: tool,
                      path: nil,
+                     script: nil,
                      order: .pre,
                      arguments: arguments,
+                     inputPaths: inputPaths,
+                     inputFileListPaths: inputFileListPaths,
+                     outputPaths: outputPaths,
+                     outputFileListPaths: outputFileListPaths)
+    }
+
+    public static func pre(script: String,
+                           name: String,
+                           inputPaths: [Path] = [],
+                           inputFileListPaths: [Path] = [],
+                           outputPaths: [Path] = [],
+                           outputFileListPaths: [Path] = []) -> TargetAction {
+        TargetAction(name: name,
+                     tool: nil,
+                     path: nil,
+                     script: script,
+                     order: .pre,
+                     arguments: [],
                      inputPaths: inputPaths,
                      inputFileListPaths: inputFileListPaths,
                      outputPaths: outputPaths,
@@ -131,6 +155,7 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: tool,
                      path: nil,
+                     script: nil,
                      order: .pre,
                      arguments: arguments,
                      inputPaths: inputPaths,
@@ -160,6 +185,7 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: nil,
                      path: path,
+                     script: nil,
                      order: .pre,
                      arguments: arguments,
                      inputPaths: inputPaths,
@@ -189,6 +215,7 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: nil,
                      path: path,
+                     script: nil,
                      order: .pre,
                      arguments: arguments,
                      inputPaths: inputPaths,
@@ -218,8 +245,27 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: tool,
                      path: nil,
+                     script: nil,
                      order: .post,
                      arguments: arguments,
+                     inputPaths: inputPaths,
+                     inputFileListPaths: inputFileListPaths,
+                     outputPaths: outputPaths,
+                     outputFileListPaths: outputFileListPaths)
+    }
+
+    public static func post(script: String,
+                            name: String,
+                            inputPaths: [Path] = [],
+                            inputFileListPaths: [Path] = [],
+                            outputPaths: [Path] = [],
+                            outputFileListPaths: [Path] = []) -> TargetAction {
+        TargetAction(name: name,
+                     tool: nil,
+                     path: nil,
+                     script: script,
+                     order: .post,
+                     arguments: [],
                      inputPaths: inputPaths,
                      inputFileListPaths: inputFileListPaths,
                      outputPaths: outputPaths,
@@ -247,6 +293,7 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: tool,
                      path: nil,
+                     script: nil,
                      order: .post,
                      arguments: arguments,
                      inputPaths: inputPaths,
@@ -276,6 +323,7 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: nil,
                      path: path,
+                     script: nil,
                      order: .post,
                      arguments: arguments,
                      inputPaths: inputPaths,
@@ -305,6 +353,7 @@ public struct TargetAction: Codable, Equatable {
         TargetAction(name: name,
                      tool: nil,
                      path: path,
+                     script: nil,
                      order: .post,
                      arguments: arguments,
                      inputPaths: inputPaths,
@@ -327,9 +376,15 @@ public struct TargetAction: Codable, Equatable {
         if let path = try container.decodeIfPresent(Path.self, forKey: .path) {
             self.path = path
             tool = nil
+            script = nil
+        } else if let tool = try container.decodeIfPresent(String.self, forKey: .tool){
+            path = nil
+            self.tool = tool
+            script = nil
         } else {
             path = nil
-            tool = try container.decode(String.self, forKey: .tool)
+            tool = nil
+            script = try container.decode(String.self, forKey: .script)
         }
     }
 
@@ -349,6 +404,9 @@ public struct TargetAction: Codable, Equatable {
         }
         if let path = path {
             try container.encode(path, forKey: .path)
+        }
+        if let script = script {
+            try container.encode(script, forKey: .script)
         }
     }
 }

@@ -66,12 +66,14 @@ extension Target {
 extension TargetAction {
     public static func test(name: String = "Action",
                             tool: String? = nil,
+                            script: String? = nil,
                             path: Path? = nil,
                             order: Order = .pre,
                             arguments: [String] = []) -> TargetAction {
         TargetAction(name: name,
                      tool: tool,
                      path: path,
+                     script: script,
                      order: order,
                      arguments: arguments)
     }

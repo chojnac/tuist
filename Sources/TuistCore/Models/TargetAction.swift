@@ -19,6 +19,8 @@ public struct TargetAction {
     /// Name of the tool to execute. Tuist will look up the tool on the environment's PATH
     public let tool: String?
 
+    public let script: String?
+
     /// Path to the script to execute
     public let path: AbsolutePath?
 
@@ -56,6 +58,7 @@ public struct TargetAction {
                 order: Order,
                 tool: String? = nil,
                 path: AbsolutePath? = nil,
+                script: String? = nil,
                 arguments: [String] = [],
                 inputPaths: [AbsolutePath] = [],
                 inputFileListPaths: [AbsolutePath] = [],
@@ -65,6 +68,7 @@ public struct TargetAction {
         self.order = order
         self.tool = tool
         self.path = path
+        self.script = script
         self.arguments = arguments
         self.inputPaths = inputPaths
         self.inputFileListPaths = inputFileListPaths
@@ -81,9 +85,14 @@ public struct TargetAction {
     public func shellScript(sourceRootPath: AbsolutePath) throws -> String {
         if let path = path {
             return "\"${PROJECT_DIR}\"/\(path.relative(to: sourceRootPath).pathString) \(arguments.joined(separator: " "))"
-        } else {
-            return try "\(System.shared.which(tool!).spm_chomp().spm_chuzzle()!) \(arguments.joined(separator: " "))"
+        } else if let tool = tool {
+            return try "\(System.shared.which(tool).spm_chomp().spm_chuzzle()!) \(arguments.joined(separator: " "))"
+        } else if let script = script {
+            return script
         }
+        
+        assertionFailure("path, tool and script field is empty. This shouldn't happen!")
+        return ""
     }
 }
 
